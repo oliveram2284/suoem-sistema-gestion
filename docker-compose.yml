@@ -1,0 +1,66 @@
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: suoem_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/custom.ini
+    networks:
+      - suoem_network
+    depends_on:
+      - mysql
+      - redis
+
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: suoem_nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - suoem_network
+    depends_on:
+      - app
+
+  mysql:
+    image: mysql:8.0
+    container_name: suoem_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-suoem}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MYSQL_USER: ${DB_USERNAME:-suoem}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-suoem}
+    ports:
+      - "3306:3306"
+    volumes:
+      - suoem_mysql_data:/var/lib/mysql
+    networks:
+      - suoem_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: suoem_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - suoem_redis_data:/data
+    networks:
+      - suoem_network
+
+networks:
+  suoem_network:
+    driver: bridge
+
+volumes:
+  suoem_mysql_data:
+  suoem_redis_data:
