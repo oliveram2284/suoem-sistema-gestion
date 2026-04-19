@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker exec suoem_app *)",
+      "Bash(docker exec suoem_mysql *)",
+      "Bash(docker exec suoem_nginx *)",
+      "Bash(docker exec suoem_redis *)",
+      "Bash(docker exec --user root suoem_app *)",
+      "Bash(docker exec --env * suoem_app *)",
+      "Bash(docker compose *)",
+      "Bash(docker ps *)"
+    ],
+    "deny": [
+      "Bash(docker compose down --volumes)",
+      "Bash(docker volume rm *)",
+      "Bash(docker system prune *)",
+      "Bash(* php artisan migrate:fresh*)",
+      "Bash(* php artisan migrate:reset*)",
+      "Bash(* php artisan db:wipe*)",
+      "Bash(* DROP DATABASE *)",
+      "Bash(* DROP TABLE *)",
+      "Bash(git push --force *)",
+      "Bash(rm -rf *)"
+    ]
+  }
+}
